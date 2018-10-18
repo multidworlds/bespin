@@ -16,5 +16,5 @@ to generate the following power spectrum
 and this corresponding cloudy, variable brown dwarf map:
 
 <p align="center">
-  <img width = "450" src="https://github.com/multidworlds/bespin/blob/master/img/clouds.gif?raw=true"/>
+  <img width = "350" src="https://github.com/multidworlds/bespin/blob/master/img/clouds.gif?raw=true"/>
 </p>

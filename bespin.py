@@ -105,6 +105,24 @@ def plot_coeffs(y):
     return fig, ax
 
 
+def plot_phase_curve(y, nrot=0.5):
+    """Plot the map's rotational phase curve."""
+    N, npts = y.shape
+    lmax = int(np.sqrt(N) - 1)
+    map = starry.Map(lmax)
+    theta = np.linspace(0, 360 * nrot, npts)
+    flux = np.zeros(npts)
+    fig, ax = pl.subplots(1, figsize=(8, 5))
+    for t in tqdm(range(npts)):
+        map[:, :] = y[:, t]
+        map.rotate(theta[t])
+        flux[t] = map.flux()
+    ax.plot(np.linspace(0, nrot, npts), flux)
+    ax.set_xlabel("Phase", fontsize=14)
+    ax.set_ylabel("Flux", fontsize=14)
+    return fig, ax
+
+
 def animate(y, res=150, cmap="plasma", gif="", interval=75, nrot=0.5):
     """Animate the map as it rotates."""
     N, npts = y.shape
@@ -153,8 +171,7 @@ beta = -2.0
 l0 = 2
 y = variable_map(lmax=lmax, amp=amp, tau=tau, npts=npts,
                  alpha=alpha, beta=beta, l0=l0)
-fig, ax = plot_power(y)
-fig.savefig("powerspec.png", bbox_inches="tight")
-fig, ax = plot_coeffs(y)
-fig.savefig("coeffs.png", bbox_inches="tight")
-animate(y, nrot=nrot, gif="clouds.gif")
+plot_power(y)
+plot_coeffs(y)
+plot_phase_curve(y)
+animate(y, nrot=nrot)

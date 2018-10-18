@@ -176,16 +176,21 @@ def example():
 def phase_curve(map, time, per):
     """Generate a rotational phase curve."""
     theta = 360.0 / per * time
-    flux = map.flux(theta=theta)
-    return np.array(np.diag(flux))
+    flux, grad = map.flux(theta=theta, gradient=True)
+    f = np.array(np.diag(flux))
+    dfdtheta = np.array(np.diag(grad['theta']))
+    dfdp = -360 * time * dfdtheta / per ** 2
+    dfdy = np.array(np.diagonal(np.array(grad['y'][1:]), axis1=1, axis2=2))
+    return f, dfdp, dfdy
 
 
 def lnlike(x, time, flux, err, map):
-    """Log-likelihood."""
+    """Log-likelihood with gradients."""
     # Generate the light curve from the params
     amp, tau, alpha, beta, l0, per = x[:6]
-    map[:, :] = x[6:].reshape(-1, len(time))
-    model = phase_curve(map, time, per)
+    map[0, :] = np.ones_like(time)
+    map[1:, :] = x[6:].reshape(-1, len(time))
+    model, dmdp, dmdy = phase_curve(map, time, per)
 
     # Hard bounds
     if (amp < 0) or (tau < 0) or (alpha < 0) or (beta > 0) or (per < 0):
@@ -211,11 +216,12 @@ def lnlike(x, time, flux, err, map):
 
 
 def neglnlike(*args, **kwargs):
-    return -lnlike(*args, **kwargs)
-
-
-example()
-quit()
+    nll = -lnlike(*args, **kwargs)
+    if np.isinf(nll):
+        return 1.e10
+    else:
+        print(nll)
+        return nll
 
 
 # These are fixed
@@ -226,7 +232,7 @@ time = np.linspace(0.0, 1.0, npts)
 
 # Parameters we'll try to recover
 per = 0.4345
-amp = 0.01
+amp = 0.1
 tau = 0.125
 alpha = 2.0
 beta = -2.0
@@ -237,9 +243,12 @@ y = variable_map(lmax=lmax, amp=amp, tau=tau, npts=npts,
                  alpha=alpha, beta=beta, l0=l0)
 map = starry.Map(lmax, npts)
 map[:, :] = y
-flux0 = phase_curve(map, time, per)
+flux0, _, _ = phase_curve(map, time, per)
 flux = flux0 + err * np.random.randn(npts)
 
-x = np.array([amp, tau, alpha, beta, l0, per] + list(y.flatten()))
-print(x.shape)
-print(lnlike(x, time, flux, err, map))
+y_guess = np.random.randn((lmax + 1) ** 2, npts)
+guess = np.array([0.2, 0.3, 3.1, -0.4, 2.5, 0.6] + list(y_guess[1:].flatten()))
+
+
+from scipy.optimize import minimize
+minimize(neglnlike, guess, args=(time, flux, err, map))

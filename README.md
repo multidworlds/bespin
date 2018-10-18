@@ -7,5 +7,5 @@ python bespin.py
 ```
 
 <p align="center">
-  <img width = "450" src="https://github.com/rodluger/bespin/blob/master/img/clouds.gif?raw=true"/>
+  <img width = "450" src="https://github.com/multidworlds/bespin/blob/master/img/clouds.gif?raw=true"/>
 </p>

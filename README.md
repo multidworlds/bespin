@@ -13,9 +13,9 @@ to generate the following power spectrum
   <img width = "450" src="https://github.com/multidworlds/bespin/blob/master/img/powerspec.png?raw=true"/>
 </p>
 
-and this corresponding cloudy, variable brown dwarf map:
+and this corresponding cloudy, variable brown dwarf map and rotational phase curve:
 
 <p align="center">
   <img width = "250" src="https://github.com/multidworlds/bespin/blob/master/img/clouds.gif?raw=true"/>
-  <img width = "450" src="https://github.com/multidworlds/bespin/blob/master/img/phase_curve.png?raw=true"/>
+  <img width = "350" src="https://github.com/multidworlds/bespin/blob/master/img/phase_curve.png?raw=true"/>
 </p>
